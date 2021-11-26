@@ -49,7 +49,7 @@ def server_transform(to_create, item):
 
 category_to_transform = {
     "login": login_transform,
-    "securenote": secure_note_transform
+    "securenote": secure_note_transform,
     "database": database_transform,
     "server": server_transform
 }
@@ -150,13 +150,13 @@ def import_into_1password(items: List[Dict[str, str]]):
         item_to_create = category_to_transform[item["category"]](
             item_to_create, item)
 
-        with open(f"/tmp/lp_1pw.json", "w") as f:
+        with open(f"tmp.json", "w") as f:
             json.dump(item_to_create, f)
 
         print(f"Creating {item['title']}...")
 
         tags = ','.join([import_tag, f'"{item["tag"]}"'])
-        cmd = f"op create item {item['category']} --template /tmp/lp_1pw.json --title \"{item['title']}\" --tags {tags}"
+        cmd = f"op create item {item['category']} --template tmp.json --title \"{item['title']}\" --tags {tags}"
         if item["category"] == "login":
             cmd += f" --url {item['website']}"
         read_bash_return(cmd)
@@ -167,4 +167,4 @@ items = read_lastpass_export("lastpass_export.csv")
 try:
     import_into_1password(items)
 except KeyboardInterrupt:
-    os.remove("/tmp/lp_1pw.json")
+    os.remove("tmp.json")
